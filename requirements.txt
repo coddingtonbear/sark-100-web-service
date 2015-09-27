@@ -1,0 +1,5 @@
+matplotlib>=1.4.0
+pyserial>=2.7
+colorama>=0.3.0
+flask>=0.10.0
+six

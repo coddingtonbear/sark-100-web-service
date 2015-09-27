@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=10.0;"/>
+    </head>
+    <body>
+        <form method="POST">
+            <label for="start_id">Start</label>
+            <input id="start_id" name="start" value="{{ start }}" />
+            <br />
+            <label for="end_id">End </label>
+            <input id="end_id" name="end" value="{{ end }}" />
+            <br />
+            <label for="steps_id">Steps</label>
+            <input id="steps_id" name="steps" value="{{ steps }}" />
+            <br />
+            <input id="submit_id" type="submit" />
+        </form>
+        <p>
+            <b>Resonating Frequency:</b> {{ resonating_frequency }}
+        </p>
+        <p>
+            <b>Tunable Band:</b> {{ bw_start }} - {{ bw_end }}
+        </p>
+        {% if figure %}
+            <img style="max-width: 100%; height:auto" src="data:image/png;base64,{{figure}}" />
+        {% endif %}
+    </body>
+</html>
