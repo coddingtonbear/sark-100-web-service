@@ -17,7 +17,7 @@ class DeviceError(Exception):
 def _limit_frequency(v):
     if v > MAXIMUM_FREQUENCY:
         return MAXIMUM_FREQUENCY
-    return v
+    return int(v)
 
 
 def get_connection(port):

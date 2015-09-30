@@ -28,8 +28,8 @@ def api():
     frequency_start = request.form.get('start')
     frequency_end = request.form.get('end')
     if frequency_start and frequency_end:
-        frequency_start = int(frequency_start)
-        frequency_end = int(frequency_end)
+        frequency_start = float(frequency_start)
+        frequency_end = float(frequency_end)
         _frequency_steps = int(request.form.get('steps', 100))
         frequency_step = int(
             (10 ** 6 * (frequency_end - frequency_start)) / _frequency_steps
