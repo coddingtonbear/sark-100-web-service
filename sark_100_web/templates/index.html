@@ -1,28 +1,48 @@
+<!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=10.0;"/>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     </head>
     <body>
-        <form method="POST">
-            <label for="start_id">Start (MHz)</label>
-            <input id="start_id" name="start" value="{{ start }}" />
-            <br />
-            <label for="end_id">End (MHz)</label>
-            <input id="end_id" name="end" value="{{ end }}" />
-            <br />
-            <label for="steps_id">Steps</label>
-            <input id="steps_id" name="steps" value="{{ steps }}" />
-            <br />
-            <input id="submit_id" type="submit" />
-        </form>
-        <p>
-            <b>Resonating Frequency:</b> {{ resonating_frequency }}
-        </p>
-        <p>
-            <b>Tunable Band:</b> {{ bw_start }} - {{ bw_end }}
-        </p>
-        {% if figure %}
-            <img style="max-width: 100%; height:auto" src="data:image/png;base64,{{figure}}" />
-        {% endif %}
+        <div class="container">
+            <form method="POST">
+                <label for="start_id">Start (MHz)</label>
+                <input id="start_id" name="start" value="{{ start }}" />
+                <br />
+                <label for="end_id">End (MHz)</label>
+                <input id="end_id" name="end" value="{{ end }}" />
+                <br />
+                <label for="steps_id"># Steps</label>
+                <input id="steps_id" name="steps" value="{{ steps }}" />
+                <br />
+                <input id="submit_id" type="submit" value="Scan Now" />
+            </form>
+            {% if center_frequency %}
+                <p>
+                    <b>Center Frequency:</b> {{ center_frequency }}
+                </p>
+            {% endif %}
+            {% if bw_stats %}
+                {% for band_stat in bw_stats %}
+                    <p>
+                        SWR &lt;={{ band_stat.swr_max }}
+                        between <strong>{{ band_stat.start }} MHz</strong>
+                        and <strong>{{ band_stat.end }} MHz</strong>
+                        for a total bandwidth of {{ band_stat.bandwidth }} MHz</td>
+                    </p>
+                {% endfor %}
+            {% endif %}
+            {% if figure %}
+                <img style="max-width: 100%; height:auto" src="data:image/png;base64,{{figure}}" />
+            {% endif %}
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     </body>
 </html>

@@ -27,4 +27,4 @@ Quickstart
    generated charts (your phone, perhaps), go to the web address
    ``http://<IP ADDRESS>:8000``.
 5. Enter the frequency range and step you'd like to scan, and press the
-   "Submit" button.
+   "Scan Now" button.

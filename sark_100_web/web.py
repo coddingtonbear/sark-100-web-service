@@ -52,34 +52,62 @@ def api():
 
 
 def generate_figure(samples):
+    ohms_styles = (
+        ('r', 'r:'),
+        ('x', 'y:'),
+        ('z', 'g:'),
+    )
     x = []
     yswr = []
+    handles = []
 
     for sample in samples:
         x.append(float(sample['frequency'])/10**6)
         yswr.append(sample['swr'])
 
     fake_file = StringIO()
-    figure = Figure(figsize=(8, 6, ))
+    figure = Figure(figsize=(9, 6, ), facecolor='white')
     canvas = FigureCanvasAgg(figure)
+
     axis = figure.add_subplot(111)
-    axis.plot(x, yswr, 'b')
+    axis.set_ylabel('SWR')
+    axis.set_xlabel('Frequency (MHz)')
+    axis.set_axis_bgcolor((1, 1, 1,))
+    axis_ohms = axis.twinx()
+    axis_ohms.set_ylabel('Ohms')
+
+    handles.append(
+        axis.plot(x, yswr, 'b', label='SWR')[0]
+    )
+    for prop, style in ohms_styles:
+        sample = [float(v.get(prop)) for v in samples]
+        handles.append(
+            axis_ohms.plot(x, sample, style, label=prop)[0]
+        )
+
+    figure.legend(
+        handles=handles,
+        labels=[
+            'SWR'
+        ] + [prop for prop, style in ohms_styles]
+    )
+
     canvas.print_png(fake_file)
     data = fake_file.getvalue()
 
     return data
 
 
-def get_resonating_frequency(samples):
+def get_center_frequency(samples):
     minimum_swr = 99
-    resonating_frequency = None
+    center_frequency = None
 
     for sample in samples:
         if sample['swr'] < minimum_swr:
-            resonating_frequency = sample['frequency']
+            center_frequency = sample['frequency']
             minimum_swr = sample['swr']
 
-    return resonating_frequency
+    return center_frequency
 
 
 def get_bandwidth(frequency, samples, max_swr):
@@ -118,7 +146,7 @@ def index():
     kwargs = {
         'start': '12',
         'end': '17',
-        'steps': '100',
+        'steps': '40',
     }
 
     frequency_start = request.form.get('start')
@@ -130,8 +158,8 @@ def index():
             'steps': request.form.get('steps', 100),
         })
 
-        frequency_start = int(frequency_start)
-        frequency_end = int(frequency_end)
+        frequency_start = float(frequency_start)
+        frequency_end = float(frequency_end)
         _frequency_steps = int(request.form.get('steps', 100))
         frequency_step = int(
             (10 ** 6 * (frequency_end - frequency_start)) / _frequency_steps
@@ -145,17 +173,28 @@ def index():
         )
         figure = generate_figure(samples)
 
-        resonating_frequency = get_resonating_frequency(samples)
-        start, end = get_bandwidth(resonating_frequency, samples, 2.0)
+        center_frequency = get_center_frequency(samples)
+
+        bw_stats = []
+        for swr_max in (1.5, 2, ):
+            start, end = get_bandwidth(center_frequency, samples, swr_max)
+            if start and end:
+                bw_stats.append(
+                    {
+                        'swr_max': swr_max,
+                        'start': float(start) / 10**6,
+                        'end': float(end) / 10**6,
+                        'bandwidth': float(end - start) / 10**6,
+                    }
+                )
 
         kwargs.update({
             'figure': b64encode(figure),
-            'resonating_frequency': (
-                float(resonating_frequency) / 10**6
-                if resonating_frequency else None
+            'center_frequency': (
+                float(center_frequency) / 10**6
+                if center_frequency else None
             ),
-            'bw_start': float(start) / 10**6 if start else None,
-            'bw_end': float(end) / 10**6 if end else None,
+            'bw_stats': bw_stats,
         })
 
     return render_template('index.html', **kwargs)
